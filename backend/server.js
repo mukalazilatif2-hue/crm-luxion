@@ -8,10 +8,10 @@ const cors    = require('cors');
 const pool    = require('./db');
 
 // Route modules
-const leadsRouter     = require('./routes/leads');
-const invoicesRouter  = require('./routes/invoices');
-const projectsRouter  = require('./routes/projects');
-const catalogueRouter = require('./routes/catalogue');
+const leadsRouter = require('./leads');
+const invoicesRouter = require('./invoices');
+const projectsRouter = require('./projects');
+const catalogueRouter = require('./catalogue');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
