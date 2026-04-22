@@ -2,7 +2,7 @@
 'use strict';
 const express = require('express');
 const router  = express.Router();
-const db      = require('../db');
+const db = require('./db');
 
 // GET /api/catalogue — list all items, optional ?category= filter
 router.get('/', async (req, res) => {
