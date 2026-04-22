@@ -144,16 +144,23 @@ function normCatalogueItem(r) {
 async function loadAllData() {
   const base = getApiUrl();
   if (base) {
-    const [leads, invoices, projects, catalogue] = await Promise.all([
+    const [leads, invoices, projects, catalogue, settings] = await Promise.all([
       api('GET', '/api/leads'),
       api('GET', '/api/invoices'),
       api('GET', '/api/projects'),
-      api('GET', '/api/catalogue')
+      api('GET', '/api/catalogue'),
+      api('GET', '/api/settings')
     ]);
     if (leads)     appData.leads     = leads.map(normLead);
     if (invoices)  appData.invoices  = invoices.map(normInvoice);
     if (projects)  appData.projects  = projects.map(normProject);
     if (catalogue) appData.catalogue = catalogue.map(normCatalogueItem);
+    if (settings) {
+      appData.settings = {
+        ...appData.settings,
+        ...settings
+      };
+    }
     saveLocal();
   } else {
     // No backend: use localStorage (offline mode)
@@ -1498,14 +1505,35 @@ function createQuoteFromLead(leadId) {
 }
 
 // ── Settings ─────────────────────────────────────────────────
-function saveSettings() {
-  const apiUrl = document.getElementById('settingApiUrl')?.value.trim();
+async function saveSettings() {
+  const apiUrl = document.getElementById('settingApiUrl')?.value.trim() || '';
+  const companyName = document.getElementById('settingCompany')?.value.trim() || '';
+
   if (apiUrl) {
     localStorage.setItem('luxion_api_url', apiUrl);
-    showToast('✅ Settings saved. Reloading data from backend…');
-    loadAllData().then(() => renderPage(currentPage));
+  }
+
+  const payload = {
+    companyName
+  };
+
+  const res = await api('PUT', '/api/settings', payload);
+
+  if (res) {
+    appData.settings = {
+      ...appData.settings,
+      ...payload
+    };
+    showToast('✅ Settings saved and synced.');
+    await loadAllData();
+    renderPage(currentPage);
   } else {
-    showToast('Settings saved.');
+    appData.settings = {
+      ...appData.settings,
+      ...payload
+    };
+    saveLocal();
+    showToast('⚠️ Settings saved locally only.');
   }
 }
 
