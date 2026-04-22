@@ -12,6 +12,7 @@ const leadsRouter = require('./leads');
 const invoicesRouter = require('./invoices');
 const projectsRouter = require('./projects');
 const catalogueRouter = require('./catalogue');
+const settingsRouter = require('./settings');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -35,6 +36,7 @@ app.use('/api/leads',     leadsRouter);
 app.use('/api/invoices',  invoicesRouter);
 app.use('/api/projects',  projectsRouter);
 app.use('/api/catalogue', catalogueRouter);
+app.use('/api/settings', settingsRouter);
 
 // ── Global error handler ────────────────────────────────────
 app.use((err, _req, res, _next) => {
