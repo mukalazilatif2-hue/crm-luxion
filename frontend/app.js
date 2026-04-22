@@ -1505,6 +1505,22 @@ function createQuoteFromLead(leadId) {
 }
 
 // ── Settings ─────────────────────────────────────────────────
+function applySettingsToUI() {
+  const urlField = document.getElementById('settingApiUrl');
+  if (urlField) {
+    urlField.value = localStorage.getItem('luxion_api_url') || '';
+  }
+
+  const phoneField = document.getElementById('settingCompanyPhone');
+  if (phoneField && appData.settings?.companyPhone !== undefined) {
+    phoneField.value = appData.settings.companyPhone || '';
+  }
+
+  const emailField = document.getElementById('settingCompanyEmail');
+  if (emailField && appData.settings?.companyEmail !== undefined) {
+    emailField.value = appData.settings.companyEmail || '';
+  }
+}
 async function saveSettings() {
   const apiUrl = document.getElementById('settingApiUrl')?.value.trim() || '';
   const companyPhone = document.getElementById('settingCompanyPhone')?.value.trim() || '';
@@ -1589,12 +1605,14 @@ function showToast(msg) {
   }
 
   // Restore saved API URL into settings field
-  const savedUrl = localStorage.getItem('luxion_api_url') || '';
-  const urlField = document.getElementById('settingApiUrl');
-  if (urlField) urlField.value = savedUrl;
+  // Apply local settings first
+applySettingsToUI();
 
-  // Load data
-  await loadAllData();
+// Load data
+await loadAllData();
+
+// Apply backend-loaded settings to the form
+applySettingsToUI();
 
   // Populate catalogue from localStorage if empty (no backend configured)
   if (appData.catalogue.length === 0) {
