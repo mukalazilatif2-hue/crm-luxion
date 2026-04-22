@@ -867,9 +867,9 @@ function downloadInvoicePDF(id) {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(180, 195, 210);
-  const companyEmail = appData.settings?.companyEmail || 'luxionsolutionsltd@outlook'.com';
-const companyPhone = appData.settings?.companyPhone || '+256 709 497 904';
-doc.text(`Kampala, Uganda  |  ${companyEmail}  |  ${companyPhone}`, 35, 23);
+  const companyEmail = appData.settings?.companyEmail || 'luxionsolutionsltd@outlook.com';
+  const companyPhone = appData.settings?.companyPhone || '+256 709 497 904';
+  doc.text(`Kampala, Uganda  |  ${companyEmail}  |  ${companyPhone}`, 35, 23);
   doc.text('Owner: Latif Mukalazi', 35, 29);
 
   // INVOICE label
@@ -982,11 +982,11 @@ doc.text(`Kampala, Uganda  |  ${companyEmail}  |  ${companyPhone}`, 35, 23);
     const noteText = isInvOverdue
       ? '⚠  This invoice is overdue. Please arrange payment immediately.'
       : '📅  Payment is due on ' + fmtDate(inv.due) + '. Please pay promptly.';
-    doc.text(noteText, W / 2, noteY + 6.5, { align: 'center' });
-    doc.setTextColor(...gray);
-doc.setFont('helvetica', 'normal');
-doc.setFontSize(8);
-doc.text('Payment Terms: 70% to commence works, 30% upon completion.', 14, noteY + 16);
+   doc.text(noteText, W / 2, noteY + 6.5, { align: 'center' });
+   doc.setTextColor(...gray);
+   doc.setFont('helvetica', 'normal');
+   doc.setFontSize(8);
+   doc.text('Payment Terms: 70% to commence works, 30% upon completion.', 14, noteY + 16);
   }
 
   // ── Footer ──
@@ -995,7 +995,7 @@ doc.text('Payment Terms: 70% to commence works, 30% upon completion.', 14, noteY
   doc.setTextColor(...gray);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
-  doc.text('Luxion Solutions Limited  ·  Kampala, Uganda  ·  hello@luxionsolutions.com', W / 2, 284, { align: 'center' });
+  doc.text(`Luxion Solutions Limited  ·  Kampala, Uganda  ·  ${companyEmail}  ·  ${companyPhone}`, W / 2, 284, { align: 'center' });
   doc.text(`Generated on ${new Date().toLocaleDateString('en-UG')}  ·  Owner: Latif Mukalazi`, W / 2, 290, { align: 'center' });
 
   doc.save(`${inv.number}-Luxion.pdf`);
@@ -1526,11 +1526,19 @@ function applySettingsToUI() {
   if (emailField && appData.settings?.companyEmail !== undefined) {
     emailField.value = appData.settings.companyEmail || '';
   }
+
+  const quoteMarkupField = document.getElementById('qMarkupInput');
+  if (quoteMarkupField && appData.settings?.markup !== undefined) {
+    quoteMarkupField.value = appData.settings.markup;
+  }
 }
+
 async function saveSettings() {
   const apiUrl = document.getElementById('settingApiUrl')?.value.trim() || '';
   const companyPhone = document.getElementById('settingCompanyPhone')?.value.trim() || '';
   const companyEmail = document.getElementById('settingCompanyEmail')?.value.trim() || '';
+  const quoteMarkupField = document.getElementById('qMarkupInput');
+  const markup = parseInt(quoteMarkupField?.value) || appData.settings?.markup || 40;
 
   if (apiUrl) {
     localStorage.setItem('luxion_api_url', apiUrl);
@@ -1538,7 +1546,8 @@ async function saveSettings() {
 
   const payload = {
     companyPhone,
-    companyEmail
+    companyEmail,
+    markup
   };
 
   const base = getApiUrl();
@@ -1610,15 +1619,14 @@ function showToast(msg) {
     document.getElementById('darkToggle').classList.add('on');
   }
 
-  // Restore saved API URL into settings field
-  // Apply local settings first
-applySettingsToUI();
+  // Restore local settings into UI first
+  applySettingsToUI();
 
-// Load data
-await loadAllData();
+  // Load data
+  await loadAllData();
 
-// Apply backend-loaded settings to the form
-applySettingsToUI();
+  // Re-apply synced settings after backend load
+  applySettingsToUI();
 
   // Populate catalogue from localStorage if empty (no backend configured)
   if (appData.catalogue.length === 0) {
