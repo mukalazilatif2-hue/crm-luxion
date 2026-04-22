@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Luxion Operations System</title>
+<link rel="stylesheet" href="style.css">
+
+<!-- Chart.js (pipeline chart) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- jsPDF (invoice PDF download) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- API loading bar -->
+<div class="api-loader" id="apiLoader"></div>
+
+<div class="app-shell">
+
+<!-- SIDEBAR (desktop) -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">LS</div>
+    <div class="logo-text">
+      <strong>Luxion Solutions</strong>
+      <span>Operations System</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <div class="nav-item active" onclick="navigate('dashboard')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Dashboard
+    </div>
+
+    <div class="nav-section-label">Sales</div>
+    <div class="nav-item" onclick="navigate('leads')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Leads & Deals
+    </div>
+    <div class="nav-item" onclick="navigate('pricing')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      Pricing Engine
+    </div>
+
+    <div class="nav-section-label">Operations</div>
+    <div class="nav-item" onclick="navigate('invoices')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+      Invoices
+    </div>
+    <div class="nav-item" onclick="navigate('projects')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      Projects
+    </div>
+
+    <div class="nav-section-label">System</div>
+    <div class="nav-item" onclick="navigate('settings')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      Settings
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar">LM</div>
+      <div class="user-info">
+        <strong>Latif Mukalazi</strong>
+        <span>Owner / Admin</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-subtitle" id="topbarSub">Sales, projects, pricing, and profit in one place.</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-primary btn-sm" id="topbarCta" onclick="topbarAction()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Lead
+      </button>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="page active" id="page-dashboard">
+
+      <div id="dashboardAlert"></div>
+
+      <div class="quick-actions">
+        <button class="quick-action-btn" onclick="openLeadModal()">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          New Lead
+        </button>
+        <button class="quick-action-btn" onclick="navigate('pricing');setTimeout(()=>switchPricingTab('quote'),100)">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Create Quote
+        </button>
+        <button class="quick-action-btn" onclick="openInvoiceModal()">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Invoice
+        </button>
+        <button class="quick-action-btn" onclick="openProjectModal()">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+          New Project
+        </button>
+      </div>
+
+      <!-- Financial Highlight Row (dynamic) -->
+      <div class="financial-highlight-row" id="financialHighlightRow">
+        <div class="stat-card green-accent financial-card">
+          <div class="stat-label">Total Invoiced</div>
+          <div class="stat-value" id="statTotalInvoiced">—</div>
+          <div class="stat-sub positive">All invoices</div>
+        </div>
+        <div class="stat-card red-accent financial-card">
+          <div class="stat-label">Outstanding</div>
+          <div class="stat-value" id="statOutstanding">—</div>
+          <div class="stat-sub warning" id="statOutstandingSub">Unpaid &amp; Partial</div>
+        </div>
+        <div class="stat-card gold-accent financial-card">
+          <div class="stat-label">Collected</div>
+          <div class="stat-value" id="statCollected">—</div>
+          <div class="stat-sub positive">Paid invoices</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="dashboard-grid">
+        <div>
+          <!-- Recent Leads -->
+          <div class="card mb-24">
+            <div class="card-header">
+              <div class="card-title">Recent Leads</div>
+              <button class="btn btn-ghost btn-sm" onclick="navigate('leads')">View all →</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Client</th><th>Service</th><th>Value</th><th>Stage</th></tr>
+                </thead>
+                <tbody id="recentLeadsTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Active Projects -->
+          <div class="card mb-24">
+            <div class="card-header">
+              <div class="card-title">Active Projects</div>
+              <button class="btn btn-ghost btn-sm" onclick="navigate('projects')">View all →</button>
+            </div>
+            <div class="card-body" id="dashboardProjects"></div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Pipeline Chart -->
+          <div class="card mb-20">
+            <div class="card-header"><div class="card-title">Pipeline Stages</div></div>
+            <div class="pipeline-chart-wrap card-body">
+              <canvas id="pipelineChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Upcoming Follow-ups -->
+          <div class="card mb-20">
+            <div class="card-header"><div class="card-title">Upcoming Follow-ups</div></div>
+            <div class="card-body">
+              <div class="activity-list" id="followUpsActivity"></div>
+            </div>
+          </div>
+
+          <!-- Invoice Status -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">Invoice Status</div></div>
+            <div class="card-body" id="invoiceStatusWidget"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LEADS ===== -->
+    <div class="page" id="page-leads">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Leads & Deals <small id="leadCount"></small></div>
+        </div>
+        <div class="flex gap-8">
+          <div class="search-wrap">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" class="search-input" placeholder="Search leads..." id="leadSearch" oninput="filterLeads()">
+          </div>
+          <button class="btn btn-primary" onclick="openLeadModal()">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Lead
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-chip active" onclick="filterLeadStage('all', this)">All</div>
+        <div class="filter-chip" onclick="filterLeadStage('New', this)">New</div>
+        <div class="filter-chip" onclick="filterLeadStage('Contacted', this)">Contacted</div>
+        <div class="filter-chip" onclick="filterLeadStage('Quoted', this)">Quoted</div>
+        <div class="filter-chip" onclick="filterLeadStage('Negotiation', this)">Negotiation</div>
+        <div class="filter-chip" onclick="filterLeadStage('Won', this)">Won</div>
+        <div class="filter-chip" onclick="filterLeadStage('Lost', this)">Lost</div>
+      </div>
+
+      <div class="card table-leads">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Client / Business</th><th>Service</th><th>Value</th><th>Stage</th><th>Priority</th><th>Follow-up</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="leadsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="lead-cards" id="leadCardsContainer"></div>
+    </div>
+
+    <!-- ===== PRICING ENGINE ===== -->
+    <div class="page" id="page-pricing">
+      <div class="pricing-tabs">
+        <button class="pricing-tab active" id="ptab-catalogue" onclick="switchPricingTab('catalogue')">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+          Price Catalogue
+        </button>
+        <button class="pricing-tab" id="ptab-quote" onclick="switchPricingTab('quote')">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Quote Builder
+        </button>
+      </div>
+
+      <!-- Catalogue Tab -->
+      <div id="pricing-catalogue">
+        <div class="section-header mt-16">
+          <div>
+            <div class="section-title">Price Catalogue <small>Your saved item prices</small></div>
+          </div>
+          <button class="btn btn-primary" onclick="openCatalogueItemModal()">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Item
+          </button>
+        </div>
+
+        <div class="filter-bar" id="catalogueFilterBar">
+          <div class="filter-chip active" onclick="filterCatalogue('all',this)">All</div>
+          <div class="filter-chip" onclick="filterCatalogue('CCTV',this)">📷 CCTV</div>
+          <div class="filter-chip" onclick="filterCatalogue('Digital',this)">💻 Digital</div>
+          <div class="filter-chip" onclick="filterCatalogue('Labor',this)">🔧 Labor</div>
+          <div class="filter-chip" onclick="filterCatalogue('General',this)">📋 General</div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Item Name</th><th>Category</th><th>Unit</th><th>Unit Cost (UGX)</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="catalogueTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quote Builder Tab -->
+      <div id="pricing-quote" style="display:none">
+        <div class="section-header mt-16">
+          <div>
+            <div class="section-title">Quote Builder</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Pick items from your catalogue, set quantities — system calculates everything.</div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-outline btn-sm" onclick="clearQuote()">Clear</button>
+            <button class="btn btn-gold" onclick="saveQuoteAsInvoice()">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Save as Invoice
+            </button>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <div class="card mb-20">
+              <div class="card-header"><div class="card-title">Project Details</div></div>
+              <div class="card-body">
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label">Client Name</label>
+                    <input type="text" class="form-control" id="quoteClient" placeholder="e.g. Primus Hardware Shop" oninput="recalcQuote()">
+                  </div>
+                  <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label">Project Type</label>
+                    <select class="form-control" id="quoteType" onchange="filterQuoteItems()">
+                      <option value="all">All Items</option>
+                      <option value="CCTV">CCTV Project</option>
+                      <option value="Digital">Website / Digital</option>
+                      <option value="Labor">Labor Only</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card mb-20">
+              <div class="card-header">
+                <div class="card-title">Add Items to Quote</div>
+                <div class="search-wrap" style="max-width:200px">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                  <input type="text" class="search-input" placeholder="Search items..." id="quoteSearch" oninput="renderQuoteItemPicker()">
+                </div>
+              </div>
+              <div class="card-body" style="padding:12px">
+                <div id="quoteItemPicker" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Quote Line Items</div>
+                <span class="badge badge-blue" id="quoteLineCount">0 items</span>
+              </div>
+              <div id="quoteLineItems">
+                <div class="empty-state" style="padding:32px">
+                  <div class="empty-state-icon">🛒</div>
+                  <div class="empty-state-title">No items added yet</div>
+                  <div class="empty-state-sub">Click items above to add them to the quote</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="pricing-summary">
+              <div class="pricing-summary-title">📊 Quote Summary</div>
+              <div id="quoteSummaryClient" style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:12px;min-height:18px"></div>
+              <div id="profitStatusBadge" class="profit-status-badge" style="display:none"></div>
+              <div id="quoteSummaryLines" style="margin-bottom:8px"></div>
+              <div class="pricing-row-sum total">
+                <span class="sum-label">Total Cost</span>
+                <span class="sum-value" id="qSumTotal">UGX 0</span>
+              </div>
+              <div class="markup-control">
+                <div class="markup-label">Markup % (your profit)</div>
+                <input type="number" class="markup-input" id="qMarkupInput" value="40" min="0" max="500" oninput="recalcQuote()">
+              </div>
+              <div style="margin-top:16px">
+                <div class="pricing-row-sum"><span class="sum-label">Suggested Price</span><span class="sum-value font-mono" id="qSumSelling" style="color:#93C5FD">UGX 0</span></div>
+                <div class="pricing-row-sum"><span class="sum-label">Min Safe Price</span><span class="sum-value font-mono" id="qSumMinSafe" style="color:#FCD34D">UGX 0</span></div>
+                <div class="pricing-row-sum"><span class="sum-label">Est. Profit</span><span class="sum-value font-mono" id="qSumProfit" style="color:#6EE7B7">UGX 0</span></div>
+              </div>
+              <div class="profit-bar-wrap">
+                <div class="profit-bar-label"><span>Profit Margin</span><span id="qMarginPct">0%</span></div>
+                <div class="profit-bar-bg"><div class="profit-bar-fill" id="qMarginBar" style="width:0%"></div></div>
+              </div>
+              <div class="pricing-warning-strong" id="qPricingWarning">⚠️ This price is below safe margin. You may lose money on this job.</div>
+              <button class="btn btn-primary" style="width:100%;margin-top:16px;justify-content:center" onclick="saveQuoteAsInvoice()">Generate Invoice from Quote</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== INVOICES ===== -->
+    <div class="page" id="page-invoices">
+      <div class="section-header">
+        <div><div class="section-title">Invoices <small id="invoiceCount"></small></div></div>
+        <button class="btn btn-primary" onclick="openInvoiceModal()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Invoice
+        </button>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-chip active" onclick="filterInvoice('all', this)">All</div>
+        <div class="filter-chip" onclick="filterInvoice('Unpaid', this)">Unpaid</div>
+        <div class="filter-chip" onclick="filterInvoice('Partial', this)">Partial</div>
+        <div class="filter-chip" onclick="filterInvoice('Paid', this)">Paid</div>
+        <div class="filter-chip" onclick="filterInvoice('Overdue', this)">Overdue</div>
+      </div>
+      <div id="invoicesList"></div>
+    </div>
+
+    <!-- ===== PROJECTS ===== -->
+    <div class="page" id="page-projects">
+      <div class="section-header">
+        <div><div class="section-title">Projects <small id="projectCount"></small></div></div>
+        <button class="btn btn-primary" onclick="openProjectModal()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Project
+        </button>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-chip active" onclick="filterProject('all', this)">All</div>
+        <div class="filter-chip" onclick="filterProject('Website', this)">Website</div>
+        <div class="filter-chip" onclick="filterProject('CRM', this)">CRM / System</div>
+        <div class="filter-chip" onclick="filterProject('CCTV', this)">CCTV</div>
+        <div class="filter-chip" onclick="filterProject('active', this)">Active</div>
+        <div class="filter-chip" onclick="filterProject('Completed', this)">Completed</div>
+      </div>
+      <div id="projectsList"></div>
+    </div>
+
+    <!-- ===== SETTINGS ===== -->
+    <div class="page" id="page-settings">
+      <div class="section-title mb-24">System Settings</div>
+      <div style="max-width:560px">
+        <div class="settings-section">
+          <div class="settings-section-title">🏢 Company</div>
+          <div class="card">
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Company Name</label>
+                <input type="text" class="form-control" value="Luxion Solutions Limited" id="settingCompany">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Owner</label>
+                <input type="text" class="form-control" value="Latif Mukalazi">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-control" value="Kampala, Uganda">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" value="hello@luxionsolutions.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone</label>
+                <input type="text" class="form-control" value="+256 704 000 000">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">💰 Pricing Defaults</div>
+          <div class="card">
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Default Currency</label>
+                  <select class="form-control"><option selected>UGX - Ugandan Shilling</option><option>USD - US Dollar</option></select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Default Markup %</label>
+                  <input type="number" class="form-control" value="40" id="settingMarkup">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Invoice Due Days</label>
+                <input type="number" class="form-control" value="14">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">🎨 Appearance</div>
+          <div class="card">
+            <div class="card-body">
+              <div class="settings-row">
+                <div class="settings-row-info"><strong>Dark Mode</strong><small>Switch to dark theme</small></div>
+                <div class="toggle" id="darkToggle" onclick="toggleDark()"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">⚙️ Backend</div>
+          <div class="card">
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">API Base URL</label>
+                <input type="text" class="form-control" id="settingApiUrl" placeholder="https://your-backend.onrender.com">
+              </div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:-8px">Set this to your deployed Render backend URL.</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ===== BOTTOM NAV (mobile only) ===== -->
+<nav class="bottom-nav" id="bottomNav">
+  <div class="bottom-nav-item active" id="bnav-dashboard" onclick="navigate('dashboard')">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Home
+  </div>
+  <div class="bottom-nav-item" id="bnav-leads" onclick="navigate('leads')">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    Leads
+  </div>
+  <div class="bottom-nav-item" id="bnav-pricing" onclick="navigate('pricing')">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    Pricing
+  </div>
+  <div class="bottom-nav-item" id="bnav-invoices" onclick="navigate('invoices')">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Invoices
+  </div>
+  <div class="bottom-nav-item" id="bnav-projects" onclick="navigate('projects')">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Projects
+  </div>
+</nav>
+
+<!-- MODAL: NEW LEAD -->
+<div class="modal-overlay" id="leadModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="leadModalTitle">New Lead</div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('leadModal')">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editLeadId">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Client Name *</label><input type="text" class="form-control" id="leadName" placeholder="e.g. Dr. Sarah Nakato"></div>
+        <div class="form-group"><label class="form-label">Business Name</label><input type="text" class="form-control" id="leadBiz" placeholder="e.g. Kidsville School"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Phone</label><input type="text" class="form-control" id="leadPhone" placeholder="+256 7xx xxx xxx"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="leadEmail" placeholder="email@example.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Service Needed</label>
+          <select class="form-control" id="leadService">
+            <option>Website</option><option>CRM / System</option><option>CCTV</option>
+            <option>Website + CCTV</option><option>CRM + CCTV</option><option>Full Package</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Deal Value (UGX)</label><input type="number" class="form-control" id="leadValue" placeholder="e.g. 3500000"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Stage</label>
+          <select class="form-control" id="leadStage">
+            <option>New</option><option>Contacted</option><option>Meeting Scheduled</option>
+            <option>Quoted</option><option>Negotiation</option><option>Won</option><option>Lost</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-control" id="leadPriority">
+            <option>Low</option><option>Medium</option><option>High</option><option>Strategic</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Lead Source</label>
+          <select class="form-control" id="leadSource">
+            <option>WhatsApp</option><option>Referral</option><option>Website</option>
+            <option>Walk-in</option><option>LinkedIn</option><option>Facebook</option><option>Existing Client</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Next Follow-up</label><input type="date" class="form-control" id="leadFollowup"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" id="leadNotes" placeholder="Additional details, context, specific requirements..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('leadModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLead()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NEW INVOICE -->
+<div class="modal-overlay" id="invoiceModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="invoiceModalTitle">New Invoice</div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('invoiceModal')">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editInvoiceId">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Client Name *</label><input type="text" class="form-control" id="invClient" placeholder="Client name"></div>
+        <div class="form-group"><label class="form-label">Service / Project</label><input type="text" class="form-control" id="invProject" placeholder="e.g. Website Design"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Invoice Date</label><input type="date" class="form-control" id="invDate"></div>
+        <div class="form-group"><label class="form-label">Due Date</label><input type="date" class="form-control" id="invDue"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Amount (UGX)</label><input type="number" class="form-control" id="invAmount" placeholder="e.g. 3500000"></div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="invStatus"><option>Unpaid</option><option>Partial</option><option>Paid</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" id="invNotes" placeholder="Payment instructions, bank details, etc."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('invoiceModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInvoice()">Save Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NEW PROJECT -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="projectModalTitle">New Project</div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('projectModal')">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editProjectId">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Project Name *</label><input type="text" class="form-control" id="projName" placeholder="e.g. Kidsville Website"></div>
+        <div class="form-group"><label class="form-label">Client Name</label><input type="text" class="form-control" id="projClient" placeholder="Client name"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Project Type</label>
+          <select class="form-control" id="projType" onchange="updateProjStatuses()">
+            <option>Website</option><option>CRM / System</option><option>CCTV</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="projStatus"></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Assigned To</label><input type="text" class="form-control" id="projAssigned" placeholder="Team member"></div>
+        <div class="form-group"><label class="form-label">Project Value (UGX)</label><input type="number" class="form-control" id="projValue" placeholder="Contract value"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Start Date</label><input type="date" class="form-control" id="projStart"></div>
+        <div class="form-group"><label class="form-label">Expected Completion</label><input type="date" class="form-control" id="projEnd"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Progress (%)</label><input type="number" class="form-control" id="projProgress" placeholder="0" min="0" max="100"></div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" id="projNotes" placeholder="Project details, deliverables, special requirements..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('projectModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProject()">Save Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CATALOGUE ITEM -->
+<div class="modal-overlay" id="catalogueItemModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="catModalTitle">Add Catalogue Item</div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('catalogueItemModal')">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editCatId">
+      <div class="form-group"><label class="form-label">Item Name *</label><input type="text" class="form-control" id="catName" placeholder="e.g. Hikvision 2MP Camera"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-control" id="catCategory"><option>CCTV</option><option>Digital</option><option>Labor</option><option>General</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unit</label>
+          <select class="form-control" id="catUnit"><option>pcs</option><option>metres</option><option>hrs</option><option>days</option><option>lot</option><option>licence</option><option>year</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unit Cost (UGX) *</label>
+        <input type="number" class="form-control" id="catUnitCost" placeholder="e.g. 120000">
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Your buying/cost price. Markup will be applied in quotes.</div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes (optional)</label><input type="text" class="form-control" id="catNotes" placeholder="Brand, specs, supplier info..."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('catalogueItemModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCatalogueItem()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
