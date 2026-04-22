@@ -1507,34 +1507,40 @@ function createQuoteFromLead(leadId) {
 // ── Settings ─────────────────────────────────────────────────
 async function saveSettings() {
   const apiUrl = document.getElementById('settingApiUrl')?.value.trim() || '';
-  const companyName = document.getElementById('settingCompany')?.value.trim() || '';
+  const companyPhone = document.getElementById('settingCompanyPhone')?.value.trim() || '';
+  const companyEmail = document.getElementById('settingCompanyEmail')?.value.trim() || '';
 
   if (apiUrl) {
     localStorage.setItem('luxion_api_url', apiUrl);
   }
 
   const payload = {
-    companyName
+    companyPhone,
+    companyEmail
   };
 
-  const res = await api('PUT', '/api/settings', payload);
-
-  if (res) {
-    appData.settings = {
-      ...appData.settings,
-      ...payload
-    };
-    showToast('✅ Settings saved and synced.');
-    await loadAllData();
-    renderPage(currentPage);
-  } else {
-    appData.settings = {
-      ...appData.settings,
-      ...payload
-    };
-    saveLocal();
-    showToast('⚠️ Settings saved locally only.');
+  const base = getApiUrl();
+  if (base) {
+    const res = await api('PUT', '/api/settings', payload);
+    if (res) {
+      appData.settings = {
+        ...appData.settings,
+        ...payload
+      };
+      saveLocal();
+      applySettingsToUI();
+      showToast('✅ Settings saved and synced.');
+      return;
+    }
   }
+
+  appData.settings = {
+    ...appData.settings,
+    ...payload
+  };
+  saveLocal();
+  applySettingsToUI();
+  showToast('⚠️ Settings saved locally only.');
 }
 
 // ── Modals ───────────────────────────────────────────────────
