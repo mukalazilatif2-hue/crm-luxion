@@ -867,7 +867,9 @@ function downloadInvoicePDF(id) {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(180, 195, 210);
-  doc.text('Kampala, Uganda  |  hello@luxionsolutions.com  |  +256 704 000 000', 35, 23);
+  const companyEmail = appData.settings?.companyEmail || 'luxionsolutionsltd@outlook'.com';
+const companyPhone = appData.settings?.companyPhone || '+256 709 497 904';
+doc.text(`Kampala, Uganda  |  ${companyEmail}  |  ${companyPhone}`, 35, 23);
   doc.text('Owner: Latif Mukalazi', 35, 29);
 
   // INVOICE label
@@ -981,6 +983,10 @@ function downloadInvoicePDF(id) {
       ? '⚠  This invoice is overdue. Please arrange payment immediately.'
       : '📅  Payment is due on ' + fmtDate(inv.due) + '. Please pay promptly.';
     doc.text(noteText, W / 2, noteY + 6.5, { align: 'center' });
+    doc.setTextColor(...gray);
+doc.setFont('helvetica', 'normal');
+doc.setFontSize(8);
+doc.text('Payment Terms: 70% to commence works, 30% upon completion.', 14, noteY + 16);
   }
 
   // ── Footer ──
